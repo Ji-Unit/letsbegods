@@ -8,7 +8,8 @@
 ## Structure
 > Initial structure will be to have 2 algos done before meeting day. We'll start out with a light load and add on more if we feel the need. Structure goes as follows:
 
-* 1 Codefights problem
+* 1 Codefights Arcade problem
+* 1 Codefights Database problem (optional, maybe even just one for the week)
 * 1 Leetcode problem
     * 1 Easy on Tuesdays
     * 1 Medium on Thursdays
