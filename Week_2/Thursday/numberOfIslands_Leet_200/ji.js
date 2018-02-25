@@ -27,3 +27,14 @@ var numIslands = function(grid) {
 	landMap = {};
 	return islands;
 };
+
+var travelPaths = function(i, j, data) {
+	if (i === data.m - 1 && j === data.n - 1) return 1;
+	if (i < 0 || j < 0 || i === data.m || j === data.n) return 0;
+	return travelPaths(i + 1, j, data) + travelPaths(i, j + 1, data);
+};
+var uniquePaths = function(m, n) {
+	return travelPaths(0, 0, { m: m, n: n });
+};
+
+console.log(uniquePaths(100, 100));
