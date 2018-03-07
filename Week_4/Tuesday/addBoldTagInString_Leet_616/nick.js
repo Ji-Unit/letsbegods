@@ -23,18 +23,18 @@ var addBoldTag = function(s, dict) {
   const close = '</b>';
   let isOpened = false;
   let start;
-  let end;
+  let end = 0;
   let res = '';
-  dict.forEach(word => {
-    start = s.indexOf(word);
-    if (s !== -1) {
-      end = start + word.length;
-    }
-    while (start < end) {
-      map[start] = 1;
-      start++;
-    }
+
+  s.split('').forEach((char, i) => {
+    Object.keys(dict).forEach(dictKey => {
+      if (s.startsWith(dict[dictKey], i)) {
+        end = Math.max(end, i + dict[dictKey].length);
+      }
+    });
+    map[i] = end > i;
   });
+  // format the string from map
   for (let i = 0; i < s.length; i++) {
     if (map[i] && !isOpened) {
       isOpened = true;
