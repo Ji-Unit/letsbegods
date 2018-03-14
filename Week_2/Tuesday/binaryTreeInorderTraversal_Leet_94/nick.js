@@ -21,15 +21,15 @@ const recurseHelper = (node, res) => {
       recurseHelper(node.right, res);
     }
   }
-}
+};
 
-const inorderTraversalRecurse = (node) => {
+const inorderTraversalRecurse = node => {
   const res = [];
   recurseHelper(node, res);
   return res;
 };
 
-const inorderTraversalIterative = (node) => {
+const inorderTraversalIterative = node => {
   // use 2 array, res and stack to keep track of order
   const res = [];
   const stack = [];
@@ -38,7 +38,7 @@ const inorderTraversalIterative = (node) => {
   while (current !== null || stack.length) {
     // go all the way left first
     while (current !== null) {
-      res.push(current.val);
+      stack.push(current.val);
       current = current.left;
     }
     // we've hit a bottom node with no left
@@ -50,4 +50,3 @@ const inorderTraversalIterative = (node) => {
   }
   return res;
 };
-
