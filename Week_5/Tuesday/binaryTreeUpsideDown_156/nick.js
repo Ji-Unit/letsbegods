@@ -31,9 +31,36 @@
  * @return {TreeNode}
  */
 
+// recursive
 var upsideDownBinaryTree = function(root) {
   // Drill down to far left child
   if (!root || (!root.left && !root.right)) {
     return root;
   }
+  const newHead = upsideDownBinaryTree(root.left);
+  root.left.left = root.right;
+  root.left.right = root;
+
+  // cut connections
+  root.left = root.right = null;
+  return newHead;
+};
+
+// iterative
+var upsideDownBinaryTree = function(root) {
+  let curr = root;
+  let prev = null;
+  let next = null;
+  let temp = null;
+
+  while (curr !== null) {
+    next = curr.left;
+    curr.left = temp;
+    temp = curr.right;
+    curr.right = prev;
+    prev = curr;
+    curr = next;
+  }
+
+  return prev;
 };
