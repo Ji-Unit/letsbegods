@@ -5,10 +5,9 @@
 const reverseAndConvert = number => number.toString().split('').reverse().join('');
 
 const reverse = x => {
-    let numToChange = x;
     const max32BitInteger = 2147483647; // thanks nick
 
-    const isPositive = numToChange > 0;
+    const isPositive = x > 0;
     const revseredNumber = isPositive ? +reverseAndConvert(x) : +reverseAndConvert(x *= -1)
 
     if (revseredNumber > max32BitInteger) return 0;
