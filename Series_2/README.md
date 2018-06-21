@@ -37,12 +37,14 @@
 * Series 2 Dir
   * Topic name (ie. Binary Search)
     * Easy
-      * Medium
-      * Hard
       * Team Member Name
         * Algo#_AlgoName.js
-        * Algo#_AlgoName.js
-        * Algo#_AlgoName.js
+    * Medium
+        * Team Member Name
+          * Algo#_AlgoName.js
+    * Hard
+        * Team Member Name
+          * Algo#_AlgoName.js
 
 > The file name should be in this format: 001_algoName.js
 ---
