@@ -21,6 +21,38 @@
  * @param {number} x
  * @return {number}
  */
-var mySqrt = function(x) {
 
+// brute force
+const mySqrt = x => {
+  for (let i = 0; i <= x / 2 + 1; i++) {
+    if (Math.pow(i, 2) === x) {
+      return i;
+    }
+    if (Math.pow(i, 2) > x) {
+      return i - 1;
+    }
+  }
+  return x;
+};
+
+// using binary search
+
+const mySqrt = x => {
+  let start = 0;
+  let end = Math.floor(x / 2) + 1;
+  let mid;
+  let sqrd;
+
+  while (start <= end) {
+    mid = Math.floor(start + (end - start) / 2);
+    sqrd = Math.pow(mid, 2);
+    if (sqrd < x) {
+      start = mid + 1;
+    } else if (sqrd > x) {
+      end = mid - 1;
+    } else {
+      return mid;
+    }
+  }
+  return end;
 };

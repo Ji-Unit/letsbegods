@@ -35,12 +35,38 @@
   Output: "c"
 */
 
-
 /**
  * @param {character[]} letters
  * @param {character} target
  * @return {character}
  */
-var nextGreatestLetter = function(letters, target) {
 
+// brute force
+const nextGreatestLetter = (letters, target) => {
+  for (let i = 0; i < letters.length; i++) {
+    if (letters[i] > target) {
+      return letters[i];
+    }
+  }
+  return letters[0];
+};
+
+// bin search
+const nextGreatestLetter = (letters, target) => {
+  let start = 0;
+  let end = letters.length;
+  let mid;
+  while (start < end) {
+    mid = Math.floor(start + (end - start) / 2);
+    if (letters[mid] <= target) {
+      start = mid + 1;
+    } else {
+      end = mid;
+    }
+  }
+  if (end === letters.length) {
+    return letters[0];
+  } else {
+    return letters[end];
+  }
 };
