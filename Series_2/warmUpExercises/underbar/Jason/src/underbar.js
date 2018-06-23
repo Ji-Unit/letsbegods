@@ -1,12 +1,13 @@
-(function() {
+(function () {
   'use strict';
 
   window._ = {};
 
-  // Returns whatever value is passed as the argument. This function doesn't
-  // seem very useful, but remember it--if a function needs to provide an
-  // iterator when the user does not pass one in, this will be handy.
-  _.identity = function(val) {
+  // Returns whatever value is passed as the argument. This function doesn't seem
+  // very useful, but remember it--if a function needs to provide an iterator when
+  // the user does not pass one in, this will be handy.
+  _.identity = function (val) {
+    return val;
   };
 
   /**
@@ -30,32 +31,50 @@
 
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
-  _.first = function(array, n) {
-    return n === undefined ? array[0] : array.slice(0, n);
+  _.first = function (array, n) {
+    return n === undefined
+      ? array[0]
+      : array.slice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
-  _.last = function(array, n) {
+  _.last = function (array, n) {
+    if (n === undefined) {
+      return array[array.length - 1]
+    }
+    return n === 0
+      ? []
+      : array.slice(-n);
   };
 
-  // Call iterator(value, key, collection) for each element of collection.
-  // Accepts both arrays and objects.
+  // Call iterator(value, key, collection) for each element of collection. Accepts
+  // both arrays and objects.
   //
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
-  _.each = function(collection, iterator) {
+  _.each = function (collection, iterator) {
+    if (Array.isArray(collection)) {
+      for (let i = 0; i < collection.length; i++) {
+        const element = collection[i];
+        iterator(element, i, collection);
+      }
+    } else if (typeof collection === 'object') {
+      for (let key in collection) {
+        iterator(collection[key], key, collection)
+      }
+    }
   };
 
-  // Returns the index at which value can be found in the array, or -1 if value
-  // is not present in the array.
-  _.indexOf = function(array, target){
+  // Returns the index at which value can be found in the array, or -1 if value is
+  // not present in the array.
+  _.indexOf = function (array, target) {
     // TIP: Here's an example of a function that needs to iterate, which we've
-    // implemented for you. Instead of using a standard `for` loop, though,
-    // it uses the iteration helper `each`, which you will need to write.
+    // implemented for you. Instead of using a standard `for` loop, though, it uses
+    // the iteration helper `each`, which you will need to write.
     var result = -1;
 
-    _.each(array, function(item, index) {
+    _.each(array, function (item, index) {
       if (item === target && result === -1) {
         result = index;
       }
@@ -65,7 +84,16 @@
   };
 
   // Return all elements of an array that pass a truth test.
-  _.filter = function(collection, test) {
+  _.filter = function (collection, test) {
+    let result = [];
+
+    _.each(collection, function (item, index) {
+      if (test(item)) {
+        result.push(item);
+      }
+    });
+
+    return result;
   };
 
   // Return all elements of an array that don't pass a truth test.
