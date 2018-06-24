@@ -14,6 +14,34 @@
  * @param {number[]} nums
  * @return {number}
  */
-var singleNonDuplicate = function(nums) {
 
+// brute force
+const singleNonDuplicate = nums => {
+  for (let i = 0; i < nums.length; i += 2) {
+    if (nums[i] !== nums[i + 1]) {
+      return nums[i];
+    }
+  }
+};
+
+// bin search
+const singleNonDuplicate = nums => {
+  let start = 0;
+  let end = nums.length;
+  let mid = 0;
+
+  while (start < end) {
+    mid = Math.floor(start + (end - start) / 2);
+    // ensure we are always on the first pair of repeating numbers
+    if (mid % 2 !== 0) {
+      mid--;
+    }
+    if (nums[mid] !== nums[mid + 1]) {
+      end = mid;
+    } else {
+      // skip to the next pair
+      start = mid + 2;
+    }
+  }
+  return nums[start];
 };
