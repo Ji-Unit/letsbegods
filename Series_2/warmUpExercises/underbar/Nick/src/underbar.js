@@ -372,7 +372,7 @@
     for (let i = 0; i < longest; i++) {
       let temp = [];
       for (let j = 0; j < sorted.length; j++) {
-        temp.push(sorted[j][i]);
+        temp.push(args[j][i]);
       }
       res.push(temp);
     }
@@ -401,16 +401,47 @@
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
-  _.intersection = function() {};
+  _.intersection = function() {
+    const args = [...arguments];
+    const cache = {};
+    const flattened = _.flatten(args);
+    _.each(flattened, item => {
+      cache[item] = ++cache[item] || 1;
+    });
+    return _.filter(Object.keys(cache), item => cache[item] === args.length);
+  };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
-  _.difference = function(array) {};
+  _.difference = function(array) {
+    const args = [...arguments];
+    const flattenedComps = _.flatten(args.slice(1));
+    const others = _.reduce(
+      flattenedComps,
+      (memo, curr) => {
+        if (!memo[curr]) {
+          memo[curr] = true;
+        }
+        return memo;
+      },
+      {}
+    );
+    return _.filter(args[0], item => !others[item]);
+  };
 
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time.  See the Underbar readme for extra details
   // on this function.
   //
   // Note: This is difficult! It may take a while to implement.
-  var throttle = function(func, wait) {};
+  _.throttle = function(func, wait) {
+    let canFire = true;
+    return (...args) => {
+      if (canFire) {
+        canFire = false;
+        func.apply(this, args);
+        setTimeout(() => (canFire = true), wait);
+      }
+    };
+  };
 })();
