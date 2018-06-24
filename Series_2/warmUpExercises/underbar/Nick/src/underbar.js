@@ -195,7 +195,6 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
-    debugger;
     iterator = iterator || _.identity;
     return !_.every(collection, val => {
       return !iterator(val);
@@ -220,11 +219,27 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {};
+  _.extend = function(obj) {
+    return _.reduce(arguments, (memo, curr) => {
+      _.each(curr, (val, key) => {
+        memo[key] = val;
+      });
+      return memo;
+    });
+  };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {};
+  _.defaults = function(obj) {
+    return _.reduce(arguments, (memo, curr) => {
+      _.each(curr, (val, key) => {
+        if (memo[key] === undefined) {
+          memo[key] = val;
+        }
+      });
+      return memo;
+    });
+  };
 
   /**
    * FUNCTIONS
@@ -242,6 +257,15 @@
     // time it's called.
     // TIP: We'll return a new function that delegates to the old one, but only
     // if it hasn't been called before.
+    let called = false;
+    let res;
+    return function() {
+      if (!called) {
+        res = func.apply(this, arguments);
+        called = true;
+      }
+      return res;
+    };
   };
 
   // Memorize an expensive function's results by storing them. You may assume
@@ -252,7 +276,16 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.memoize = function(func) {};
+  _.memoize = function(func) {
+    const cache = {};
+    return function() {
+      const args = JSON.stringify(arguments);
+      if (cache[args] === undefined) {
+        cache[args] = func.apply(this, arguments);
+      }
+      return cache[args];
+    };
+  };
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -260,7 +293,13 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function(func, wait) {};
+  _.delay = function(func, wait) {
+    const funcArgs = Array.prototype.slice.call(arguments).slice(2);
+    const wrapperFunc = function() {
+      func.apply(this, funcArgs);
+    };
+    setTimeout(wrapperFunc, wait);
+  };
 
   /**
    * ADVANCED COLLECTION OPERATIONS
@@ -272,7 +311,16 @@
   // TIP: This function's test suite will ask that you not modify the original
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
-  _.shuffle = function(array) {};
+  _.shuffle = function(array) {
+    const copy = array.slice();
+    _.each(copy, (item, index) => {
+      let randIndex = Math.floor(Math.random() * (copy.length - 1));
+      let temp = copy[index];
+      copy[index] = copy[randIndex];
+      copy[randIndex] = temp;
+    });
+    return copy;
+  };
 
   /**
    * ADVANCED
@@ -284,15 +332,31 @@
 
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
-  _.invoke = function(collection, functionOrKey, args) {
-    //in case there are multiple args
+  _.invoke = function(collection, functionOrKey, ...args) {
+    const funcArgs = Array.prototype.slice.call(args).slice(2);
+    return _.map(collection, item => {
+      let method;
+      if (typeof functionOrKey === 'function') {
+        method = functionOrKey;
+      } else {
+        method = item[functionOrKey];
+      }
+      return method.apply(item, funcArgs);
+    });
   };
 
   // Sort the object's values by a criterion produced by an iterator.
   // If iterator is a string, sort objects by that property with the name
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
-  _.sortBy = function(collection, iterator) {};
+  _.sortBy = function(collection, iterator) {
+    return collection.sort((a, b) => {
+      if (typeof iterator === 'function') {
+        return iterator(a) - iterator(b);
+      }
+      return a[iterator] - b[iterator];
+    });
+  };
 
   // Zip together two or more arrays with elements of the same index
   // going together.
@@ -300,14 +364,40 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
-    //find longest array
+    // find longest array
+    const args = Array.prototype.slice.call(arguments);
+    const sorted = args.sort((a, b) => b.length - a.length);
+    const longest = sorted[0].length;
+    const res = [];
+    for (let i = 0; i < longest; i++) {
+      let temp = [];
+      for (let j = 0; j < sorted.length; j++) {
+        temp.push(sorted[j][i]);
+      }
+      res.push(temp);
+    }
+    return res;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
   //
   // Hint: Use Array.isArray to check if something is an array
-  _.flatten = function(nestedArray, result) {};
+  _.flatten = function(nestedArray, memo = []) {
+    // return [].concat.apply(nestedArray);
+    return _.reduce(
+      nestedArray,
+      (memo, curr) => {
+        if (Array.isArray(curr)) {
+          _.flatten(curr, memo);
+        } else {
+          memo.push(curr);
+        }
+        return memo;
+      },
+      memo
+    );
+  };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
