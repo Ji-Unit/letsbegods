@@ -360,14 +360,11 @@
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
     return _.map(collection, elem => {
-      if (typeof functionOrKey === "function") {
+      if (typeof functionOrKey === 'function') {
         return functionOrKey.apply(elem, args);
       }
 
-      if (typeof functionOrKey === "string") {
-        // peeked at the source code here and need to internalize this little better
-        // only found this and doesn't appear to be common knowledge:
-        // https://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string
+      if (typeof functionOrKey === 'string') {
         return elem[functionOrKey].apply(elem, args); 
       }
     });
@@ -378,6 +375,17 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if (typeof iterator === 'function') {
+      return collection.sort((first, second) => {
+        return iterator(first) > iterator(second);
+      });
+    }
+
+    if (typeof iterator === 'string') {
+        return collection.sort((first, second) => {
+          return first[iterator] > second[iterator];
+        });
+    }
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -386,6 +394,37 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    const args = Array.prototype.slice.call(arguments);
+    const result = [];
+    let inner = 0;
+    let outer = 0;
+    let zipped = [];
+
+    let lengths = args.map(sub => { return sub.length; });
+    let longest = Math.max.apply(Math, lengths);
+
+    while (outer <= args.length) {
+      if (outer === args.length) {
+        result.push(zipped);
+
+        if (inner === longest - 1) {
+          break;
+        }
+        outer = 0;
+        zipped = [];
+        inner++;
+      }
+
+      if (inner === longest) {
+        inner = 0;
+      }
+
+      if (inner <= longest) {
+        zipped.push(args[outer][inner]);
+      }
+      outer++;
+    }
+    return result;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -393,16 +432,74 @@
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    result = result || [];
+    for (let i = 0; i < nestedArray.length; i++) {
+      const element = nestedArray[i];
+
+      if (Array.isArray(element)) {
+        _.flatten(element, result)
+      } else {
+        result.push(element);
+      }
+    }
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    const args = Array.prototype.slice.call(arguments);
+    const obj = {};
+    const result = [];
+    let inner = 0;
+    let outer = 0;
+
+    while (outer < args.length) {
+      let element = args[outer][inner];
+
+      if (typeof element === 'undefined') {
+        inner = 0;
+        outer++;
+        continue;
+      }
+
+      obj[element] = obj[element] + 1 || 1;
+
+      if (obj[element] === args.length) {
+        result.push(element);
+      }
+
+      inner++;
+    }
+    return result;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    const args = Array.prototype.slice.call(arguments);
+    const obj = {};
+    let inner = 0;
+    let outer = 0;
+
+    while (outer < args.length) {
+      let element = args[outer][inner];
+
+      if (typeof element === 'undefined') {
+        inner = 0;
+        outer++;
+        continue;
+      }
+
+      if (outer === 0) {
+        obj[element] = element
+      } else if (obj.hasOwnProperty(element)) {
+        delete obj[element];
+      }
+
+      inner++;
+    }
+    return _.map(obj, key => obj[key]);
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
@@ -411,5 +508,16 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+    let alreadyCalled = false;
+    
+    return function () {
+      if (!alreadyCalled) {
+        alreadyCalled = true
+        setTimeout(() => {
+          alreadyCalled = false;
+        }, wait);
+        func();
+      }
+    };
   };
 }());
