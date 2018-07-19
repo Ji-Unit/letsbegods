@@ -8,7 +8,7 @@ You may assume that nums1 has enough space (size that is greater or equal to m +
 Example:
 
 Input:
-nums1 = [1,2,3,0,0,0], m = 3
+nums1 = [1,2,3], m = 3
 nums2 = [2,5,6],       n = 3
 
 Output: [1,2,2,3,5,6]
@@ -16,7 +16,8 @@ Output: [1,2,2,3,5,6]
 
 const merge = (nums1, m, nums2, n) => {
   let len = m + n;
-
+  m -= 1;
+  n -= 1;
   while (len--) {
     if (n < 0 || nums1[m] > nums2[n]) {
       nums1[len] = nums1[m];
